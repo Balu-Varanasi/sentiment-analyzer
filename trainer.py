@@ -32,9 +32,9 @@ class NltkTrainer(object):
         sub_obj_trainfeats = sub_splited_words[:] + obj_splited_words[:]
 
         # SVM with a Linear Kernel and default parameters
-        sub_obj_classifier = SklearnClassifier(LinearSVC())
-        sub_obj_classifier.train(sub_obj_trainfeats)
-        return sub_obj_classifier
+        classifier = SklearnClassifier(LinearSVC())
+        classifier.train(sub_obj_trainfeats)
+        return classifier
 
     def trainPosNeg(self):
         positive = "./positive"
@@ -50,9 +50,9 @@ class NltkTrainer(object):
         neg_splited_words = [(self.getBigrams(words), 'negative')
                              for words in neg_all_words]
         pos_neg_trainfeats = pos_splited_words[:] + neg_splited_words[:]
-        pos_neg_classifier = SklearnClassifier(LinearSVC())
-        pos_neg_classifier.train(pos_neg_trainfeats)
-        return pos_neg_classifier
+        classifier = SklearnClassifier(LinearSVC())
+        classifier.train(pos_neg_trainfeats)
+        return classifier
 
     def pickleClassifier(self, subj_obj_classifier, pos_neg_classifier):
         subj_obj_picklefile = open('SubjObjModel.pickle', 'wb')
