@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # sentiment trainer for Telugu
 
 import pickle
@@ -16,7 +15,7 @@ class NltkTrainer(BaseNLTKUtil):
     def __int__(self):
         self.name = None
 
-    def train_subjective_and_objective_model(self):
+    def train_subjective_objective_classifier(self):
         subjective = "./subjective"
         objective = "./objective"
         sub_files = ptr(subjective, '.*')
@@ -36,7 +35,7 @@ class NltkTrainer(BaseNLTKUtil):
         classifier.train(sub_obj_trainfeats)
         return classifier
 
-    def train_positive_and_negative_model(self):
+    def train_positive_negative_classifier(self):
         positive = "./positive"
         negative = "./negative"
         pos_files = ptr(positive, '.*')
@@ -54,7 +53,8 @@ class NltkTrainer(BaseNLTKUtil):
         classifier.train(pos_neg_trainfeats)
         return classifier
 
-    def pickleClassifier(self, subj_obj_classifier, pos_neg_classifier):
+    @staticmethod
+    def pickle_classifiers(subj_obj_classifier, pos_neg_classifier):
         subj_obj_picklefile = open('SubjObjModel.pickle', 'wb')
         pos_neg_picklefile = open('PosNegModel.pickle', 'wb')
 
@@ -65,8 +65,9 @@ class NltkTrainer(BaseNLTKUtil):
         pos_neg_picklefile.close()
 
 
-trainer = NltkTrainer()
-trainer.pickleClassifier(
-    trainer.train_subjective_and_objective_model(),
-    trainer.train_positive_and_negative_model()
-)
+if __name__ == '__main__':
+    trainer = NltkTrainer()
+    trainer.pickle_classifiers(
+        trainer.train_subjective_objective_classifier(),
+        trainer.train_positive_negative_classifier()
+    )

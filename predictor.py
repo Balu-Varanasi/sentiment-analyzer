@@ -13,29 +13,31 @@ class Sentiment(BaseNLTKUtil):
     def __int__(self):
         self.name = None
 
-    def loadSOClsssifier(self):
-        fModel = open('SubjObjModel.pickle', "rb")
-        subjobjclassifier = pickle.load(fModel)
-        fModel.close()
+    @staticmethod
+    def load_subjective_objective_classifier():
+        model_file = open('SubjObjModel.pickle', "rb")
+        subjobjclassifier = pickle.load(model_file)
+        model_file.close()
         return subjobjclassifier
 
-    def loadPNClsssifier(self):
-        fModel = open('PosNegModel.pickle', "rb")
-        posnegclassifier = pickle.load(fModel)
-        fModel.close()
-        return posnegclassifier
+    @staticmethod
+    def load_positive_negative_classifier():
+        model_file = open('PosNegModel.pickle', "rb")
+        positive_negative_classifier = pickle.load(model_file)
+        model_file.close()
+        return positive_negative_classifier
 
-    def getSubjObj(self, text):
+    def predict(self, text):
         words = Text(text.split(" "))
         bigrams = self.get_bigrams(words)
-        subjclassifier = self.loadSOClsssifier()
-        posnegclassifier = self.loadPNClsssifier()
+        subjective_objective_classifier = self.load_subjective_objective_classifier()
+        positive_negative_classifier = self.load_positive_negative_classifier()
 
-        subj_or_obj = SklearnClassifier.classify(subjclassifier, bigrams)
+        subj_or_obj = SklearnClassifier.classify(subjective_objective_classifier, bigrams)
         if subj_or_obj == "objective":
             return "neutral"
 
-        pos_or_neg = SklearnClassifier.classify(posnegclassifier, bigrams)
+        pos_or_neg = SklearnClassifier.classify(positive_negative_classifier, bigrams)
 
         if pos_or_neg == "negative":
             return "negative"
@@ -43,7 +45,8 @@ class Sentiment(BaseNLTKUtil):
             return "positive"
 
 
-sentiment = Sentiment()
-telugu_text = "అయితే సిద్దార్ధలోనూ, దర్శకుడులోనూ ఏదో కొత్తగా చేయాలనే తపన ముచ్చటపడేటట్లు చేస్తుంది. "
-print(sentiment.getSubjObj(telugu_text))
+if __name__ == '__main__':
+    sentiment = Sentiment()
+    telugu_text = "అయితే సిద్దార్ధలోనూ, దర్శకుడులోనూ ఏదో కొత్తగా చేయాలనే తపన ముచ్చటపడేటట్లు చేస్తుంది. "
+    print(sentiment.predict(telugu_text))
 

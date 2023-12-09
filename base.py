@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# sentiment trainer for Telugu
+# Base class with common methods for all NLTK utilities.
 
 import string
 
@@ -12,7 +11,8 @@ class BaseNLTKUtil(object):
     def __int__(self):
         self.name = None
 
-    def get_word_features(self, words):
+    @staticmethod
+    def get_word_features(words):
         """
         Extracts features from a list of words.
 
