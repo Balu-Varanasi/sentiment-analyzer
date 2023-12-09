@@ -1,1 +1,4 @@
 *.pickle
+.idea/
+workspace/
+__pycache__/

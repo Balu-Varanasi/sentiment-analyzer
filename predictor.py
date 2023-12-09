@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
-
 # Sentiment Analyzer for telugu
 
-import string
-import cPickle as pickle
+import pickle
+
 from nltk import Text
 from nltk.classify.scikitlearn import SklearnClassifier
-from nltk.collocations import BigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures
+
+from base import BaseNLTKUtil
 
 
-class Sentiment(object):
+class Sentiment(BaseNLTKUtil):
 
     def __int__(self):
         self.name = None
@@ -29,7 +27,7 @@ class Sentiment(object):
 
     def getSubjObj(self, text):
         words = Text(text.split(" "))
-        bigrams = self.getBigrams(words)
+        bigrams = self.get_bigrams(words)
         subjclassifier = self.loadSOClsssifier()
         posnegclassifier = self.loadPNClsssifier()
 
@@ -44,18 +42,8 @@ class Sentiment(object):
         else:
             return "positive"
 
-    def getBigrams(self, words, score_fn=BigramAssocMeasures.chi_sq, n=200):
-        bigram_finder = BigramCollocationFinder.from_words(words)
-        bigram = bigram_finder.nbest(score_fn, n)
-        bigramdict = dict([(big, True) for big in bigram])
-        bigramdict.update(self.getWordFeats(words))
-        return bigramdict
-
-    def getWordFeats(self, words):
-        return dict([(word.strip(string.punctuation), True) for word in words])
-
 
 sentiment = Sentiment()
-telugu_text = "అయితే సిద్దార్ధలోనూ, దర్శకుడులోనూ ఏదో కొత్తగా \
-                చేయాలనే తపన ముచ్చటపడేటట్లు చేస్తుంది. "
-print sentiment.getSubjObj(telugu_text)
+telugu_text = "అయితే సిద్దార్ధలోనూ, దర్శకుడులోనూ ఏదో కొత్తగా చేయాలనే తపన ముచ్చటపడేటట్లు చేస్తుంది. "
+print(sentiment.getSubjObj(telugu_text))
+

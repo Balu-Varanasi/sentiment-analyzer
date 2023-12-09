@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
-#sentiment trainer for Telugu
+# sentiment trainer for Telugu
 
-import string
-import cPickle as pickle
+import pickle
 
 from nltk.corpus import PlaintextCorpusReader as ptr
 from nltk.classify.scikitlearn import SklearnClassifier
-from nltk.collocations import BigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures
 
 from sklearn.svm import LinearSVC
 
+from base import BaseNLTKUtil
 
-class NltkTrainer(object):
+
+class NltkTrainer(BaseNLTKUtil):
 
     def __int__(self):
         self.name = None
 
-    def trainSubObj(self):
+    def train_subjective_and_objective_model(self):
         subjective = "./subjective"
         objective = "./objective"
         sub_files = ptr(subjective, '.*')
@@ -26,9 +25,9 @@ class NltkTrainer(object):
                          for fileid in sub_files.fileids()]
         obj_all_words = [obj_files.raw(fileid).split(" ")
                          for fileid in obj_files.fileids()]
-        sub_splited_words = [(self.getBigrams(words), 'subjective')
+        sub_splited_words = [(self.get_bigrams(words), 'subjective')
                              for words in sub_all_words]
-        obj_splited_words = [(self.getBigrams(words), 'objective')
+        obj_splited_words = [(self.get_bigrams(words), 'objective')
                              for words in obj_all_words]
         sub_obj_trainfeats = sub_splited_words[:] + obj_splited_words[:]
 
@@ -37,7 +36,7 @@ class NltkTrainer(object):
         classifier.train(sub_obj_trainfeats)
         return classifier
 
-    def trainPosNeg(self):
+    def train_positive_and_negative_model(self):
         positive = "./positive"
         negative = "./negative"
         pos_files = ptr(positive, '.*')
@@ -46,9 +45,9 @@ class NltkTrainer(object):
                          for fileid in pos_files.fileids()]
         neg_all_words = [neg_files.raw(fileid).split(" ")
                          for fileid in neg_files.fileids()]
-        pos_splited_words = [(self.getBigrams(words), 'positive')
+        pos_splited_words = [(self.get_bigrams(words), 'positive')
                              for words in pos_all_words]
-        neg_splited_words = [(self.getBigrams(words), 'negative')
+        neg_splited_words = [(self.get_bigrams(words), 'negative')
                              for words in neg_all_words]
         pos_neg_trainfeats = pos_splited_words[:] + neg_splited_words[:]
         classifier = SklearnClassifier(LinearSVC())
@@ -65,16 +64,9 @@ class NltkTrainer(object):
         pickle.dump(pos_neg_classifier, pos_neg_picklefile, 1)
         pos_neg_picklefile.close()
 
-    def getWordFeats(self, words):
-        return dict([(word.strip(string.punctuation), True) for word in words])
-
-    def getBigrams(self, words, score_fn=BigramAssocMeasures.chi_sq, n=200):
-        bigram_finder = BigramCollocationFinder.from_words(words)
-        bigram = bigram_finder.nbest(score_fn, n)
-        bigramdict = dict([(big, True) for big in bigram])
-        bigramdict.update(self.getWordFeats(words))
-        return bigramdict
-
 
 trainer = NltkTrainer()
-trainer.pickleClassifier(trainer.trainSubObj(), trainer.trainPosNeg())
+trainer.pickleClassifier(
+    trainer.train_subjective_and_objective_model(),
+    trainer.train_positive_and_negative_model()
+)
